@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Belajar HTML nguwawurrrrrrrr</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial;
+      }
+
+      .toolbar {
+        background: #04aa6d;
+        padding: 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .toolbar button {
+        background: white;
+        border: none;
+        padding: 6px 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      .container {
+        display: flex;
+        height: 90vh;
+      }
+
+      .editor-wrapper {
+        position: relative;
+        width: 50%;
+        height: 100%;
+      }
+
+      #code,
+      #highlight {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        font-family: monospace;
+        white-space: pre;
+        word-wrap: normal;
+        overflow: auto;
+        line-height: 1.5;
+        font-size: 16px;
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      #code {
+        background: transparent;
+        color: transparent;
+        caret-color: #ffffff;
+        z-index: 2;
+        border: none;
+        outline: none;
+        resize: none;
+      }
+
+      #highlight {
+        background: #1e1e1e;
+        color: white;
+        z-index: 1;
+        padding: 10px;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .tag {
+        color: #569cd6;
+      }
+      .attr {
+        color: #9cdcfe;
+      }
+      .value {
+        color: #ce9178;
+      }
+      .text {
+        color: #d4d4d4;
+      }
+      .comment {
+        color: #6a9955;
+      }
+
+      iframe {
+        width: 50%;
+        border: none;
+        padding-left: 20px;
+      }
+
+      #popup {
+        position: fixed;
+        background: #333;
+        padding: 5px;
+        border-radius: 5px;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      #popup button {
+        display: block;
+        margin: 2px;
+        background: white;
+        border: none;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 3px;
+        width: 100%;
+        text-align: left;
+      }
+
+      #popup button:hover {
+        background: #ddd;
+      }
+
+      .submenu {
+        display: none;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        background: #444;
+        padding: 5px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        white-space: nowrap;
+        z-index: 1001;
+      }
+
+      .submenu button {
+        background: #555;
+        color: rgb(56, 56, 56);
+        margin: 1px;
+      }
+
+      .submenu button:hover {
+        background: #666;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="toolbar">
+      <button onclick="insertTag('<h1></h1>')">H1</button>
+      <button onclick="insertTag('<p></p>')">P</button>
+      <button onclick="insertTag('<div></div>')">DIV</button>
+      <button onclick='insertTag(&apos;<img src="https://i.pinimg.com/736x/a2/f9/1c/a2f91c802c30cbf79e7b83cf65ee10db.jpg" alt="Gambar">&apos;)'>IMG</button>
+      <button onclick='insertTag(&apos;<form><input type="email" placeholder="Email"></form>&apos;)'>FORM</button>
+      <button onclick="insertTag('<ul><li>Item 1</li><li>Item 2</li></ul>')">UL</button>
+      <button onclick="insertTag('<ol><li>Item 1</li><li>Item 2</li></ol>')">OL</button>
+      <button onclick="resetCode()">Reset</button>
+    </div>
+
+    <div class="container">
+      <div class="editor-wrapper">
+        <pre id="highlight"></pre>
+        <textarea id="code"></textarea>
+      </div>
+      <iframe id="preview" sandbox="allow-same-origin allow-scripts"></iframe>
+    </div>
+
+    <!-- POPUP MENU -->
+    <div id="popup">
+      <div id="textMenu">
+        <button onclick="showSub('colorMenu')">Warna ▶</button>
+        <button onclick="showSub('sizeMenu')">Ukuran ▶</button>
+        <button onclick="showSub('weightMenu')">Ketebalan ▶</button>
+        <button onclick="showSub('alignMenu')">Align ▶</button>
+      </div>
+
+      <div id="divMenu">
+        <button onclick="showSub('displayMenu')">Display ▶</button>
+        <button onclick="showSub('gapMenu')">Gap ▶</button>
+        <button onclick="showSub('paddingMenu')">Padding ▶</button>
+        <button onclick="showSub('marginMenu')">Margin ▶</button>
+        <button onclick="showSub('bgMenu')">BG ▶</button>
+        <button onclick="showSub('radiusMenu')">Rounded ▶</button>
+        <button onclick="showSub('widthMenu')">Width ▶</button>
+        <button onclick="showSub('heightMenu')">Height ▶</button>
+        <button onclick="showSub('borderMenu')">Border ▶</button>
+        <button onclick="showSub('flexAlignMenu')">Flex Align ▶</button>
+      </div>
+
+      <div id="imgMenu">
+        <button onclick="showSub('imgSizeMenu')">Ukuran ▶</button>
+        <button onclick="showSub('imgBorderMenu')">Border ▶</button>
+        <button onclick="showSub('imgMarginMenu')">Margin ▶</button>
+      </div>
+
+      <div id="formMenu">
+        <button onclick="showSub('formInputMenu')">Input ▶</button>
+        <button onclick="showSub('formBtnMenu')">Button ▶</button>
+        <button onclick="showSub('formStyleMenu')">Style ▶</button>
+      </div>
+
+      <div id="listMenu">
+        <button onclick="showSub('listStyleMenu')">Style ▶</button>
+        <button onclick="insertListItem()">Tambah Item</button>
+      </div>
+
+      <!-- Submenus -->
+      <div id="colorMenu" class="submenu">
+        <button onclick="applyStyle('color:red;')">Merah</button>
+        <button onclick="applyStyle('color:blue;')">Biru</button>
+        <button onclick="applyStyle('color:green;')">Hijau</button>
+        <button onclick="applyStyle('color:black;')">Hitam</button>
+        <button onclick="applyStyle('color:#ff6b6b;')">Pink</button>
+      </div>
+      <div id="sizeMenu" class="submenu">
+        <button onclick="applyStyle('font-size:20px;')">20px</button>
+        <button onclick="applyStyle('font-size:40px;')">40px</button>
+        <button onclick="applyStyle('font-size:60px;')">60px</button>
+      </div>
+      <div id="weightMenu" class="submenu">
+        <button onclick="applyStyle('font-weight:bold;')">Bold</button>
+        <button onclick="applyStyle('font-weight:normal;')">Normal</button>
+      </div>
+      <div id="alignMenu" class="submenu">
+        <button onclick="applyStyle('text-align:left;')">Left</button>
+        <button onclick="applyStyle('text-align:center;')">Center</button>
+        <button onclick="applyStyle('text-align:right;')">Right</button>
+        <button onclick="applyStyle('text-align:justify;')">Justify</button>
+      </div>
+      <div id="displayMenu" class="submenu">
+        <button onclick="applyStyle('display:flex;')">Flex</button>
+        <button onclick="applyStyle('display:grid;')">Grid</button>
+        <button onclick="applyStyle('display:block;')">Block</button>
+      </div>
+      <div id="gapMenu" class="submenu">
+        <button onclick="applyStyle('gap:10px;')">10px</button>
+        <button onclick="applyStyle('gap:20px;')">20px</button>
+      </div>
+      <div id="paddingMenu" class="submenu">
+        <button onclick="applyStyle('padding:10px;')">10px</button>
+        <button onclick="applyStyle('padding:20px;')">20px</button>
+      </div>
+      <div id="marginMenu" class="submenu">
+        <button onclick="applyStyle('margin:10px;')">10px</button>
+        <button onclick="applyStyle('margin:0 auto;')">Center</button>
+      </div>
+      <div id="bgMenu" class="submenu">
+        <button onclick="applyStyle('background:red;')">Merah</button>
+        <button onclick="applyStyle('background:blue;')">Biru</button>
+        <button onclick="applyStyle('background:yellow;')">Kuning</button>
+        <button onclick="applyStyle('background:#333;color:white;')">Dark</button>
+        <button onclick="applyStyle('background:linear-gradient(45deg, #ff6b6b, #4ecdc4); color:white;')">Gradient</button>
+      </div>
+      <div id="radiusMenu" class="submenu">
+        <button onclick="applyStyle('border-radius:10px;')">10px</button>
+        <button onclick="applyStyle('border-radius:50%;')">Circle</button>
+      </div>
+      <div id="widthMenu" class="submenu">
+        <button onclick="applyStyle('width:100px;')">100px</button>
+        <button onclick="applyStyle('width:50%;')">50%</button>
+        <button onclick="applyStyle('width:100%;')">Full</button>
+      </div>
+      <div id="heightMenu" class="submenu">
+        <button onclick="applyStyle('height:100px;')">100px</button>
+        <button onclick="applyStyle('height:200px;')">200px</button>
+        <button onclick="applyStyle('height:100vh;')">Full Height</button>
+      </div>
+      <div id="borderMenu" class="submenu">
+        <button onclick="applyStyle('border:1px solid black;')">1px</button>
+        <button onclick="applyStyle('border:2px solid red;')">2px Red</button>
+        <button onclick="applyStyle('border:3px solid blue; width:100px; height:100px; border-radius:50%;')">Circle Border</button>
+      </div>
+      <div id="flexAlignMenu" class="submenu">
+        <button onclick="applyStyle('justify-content:center;')">Center</button>
+        <button onclick="applyStyle('justify-content:space-between;')">Space Between</button>
+        <button onclick="applyStyle('align-items:center;')">Align Center</button>
+        <button onclick="applyStyle('flex-direction:column;')">Column</button>
+      </div>
+      <div id="imgSizeMenu" class="submenu">
+        <button onclick="applyStyle('width:200px; height:auto;')">200px</button>
+        <button onclick="applyStyle('width:300px; height:200px; object-fit:cover;')">300x200</button>
+        <button onclick="applyStyle('width:100%; height:300px; object-fit:cover;')">Full Width</button>
+      </div>
+      <div id="imgBorderMenu" class="submenu">
+        <button onclick="applyStyle('border:2px solid #333; border-radius:10px; padding:5px;')">Border + Radius</button>
+        <button onclick="applyStyle('border-radius:50%; width:150px; height:150px; object-fit:cover;')">Circle</button>
+      </div>
+      <div id="imgMarginMenu" class="submenu">
+        <button onclick="applyStyle('margin:20px auto; display:block;')">Center</button>
+        <button onclick="applyStyle('margin:10px;')">Margin 10px</button>
+      </div>
+
+      <div id="formInputMenu" class="submenu">
+        <button onclick='insertTag(&apos;<input type="text" placeholder="Nama">&apos;)'>Text</button>
+        <button onclick='insertTag(&apos;<input type="email" placeholder="Email">&apos;)'>Email</button>
+        <button onclick='insertTag(&apos;<input type="password" placeholder="Password">&apos;)'>Password</button>
+        <button onclick='insertTag(&apos;<textarea placeholder="Pesan" rows="4" cols="50"></textarea>&apos;)'>Textarea</button>
+      </div>
+      <div id="formBtnMenu" class="submenu">
+        <button onclick="insertTag('<button type=&quot;submit&quot;>Kirim</button>')">Submit</button>
+        <button onclick="insertTag('<button type=&quot;reset&quot;>Reset</button>')">Reset</button>
+      </div>
+
+      <div id="formStyleMenu" class="submenu">
+        <button onclick="applyStyle('padding:15px; border-radius:8px; border:1px solid #ccc; margin:5px 0; width:100%; box-sizing:border-box;')">Input Style</button>
+        <button onclick="applyStyle('background:#04aa6d; color:white; padding:12px 24px; border:none; border-radius:8px; cursor:pointer; font-size:16px; width:100%;')">Button Style</button>
+      </div>
+      <div id="listStyleMenu" class="submenu">
+        <button onclick="applyStyle('list-style:none; padding-left:0;')">No Bullet</button>
+        <button onclick="applyStyle('list-style:circle; padding-left:20px;')">Circle</button>
+        <button onclick="applyStyle('padding:20px; background:#f9f9f9; border-radius:10px;')">Card Style</button>
+      </div>
+    </div>
+
+    <script>
+      const code = document.getElementById("code");
+      const highlight = document.getElementById("highlight");
+      const preview = document.getElementById("preview");
+      const popup = document.getElementById("popup");
+      const textMenu = document.getElementById("textMenu");
+      const divMenu = document.getElementById("divMenu");
+      const imgMenu = document.getElementById("imgMenu");
+      const formMenu = document.getElementById("formMenu");
+      const listMenu = document.getElementById("listMenu");
+
+      // Simpan posisi cursor global
+      let currentCursorPos = 0;
+
+      const DEFAULT_CODE = `<!DOCTYPE html>
+<html>
+<head>
+  <title>UIN SATU</title>
+</head>
+<body style="margin:0; font-family:Arial; background:#f5f5f5;">
+
+  <!-- HEADER -->
+  <header style="background:linear-gradient(135deg,#04aa6d,#04d68d); color:white; text-align:center; padding:40px;">
+    <h1 style="font-size:48px; margin:0;">UIN SATU</h1>
+    <p style="font-size:20px; margin-top:10px;">Kampus e sopo iki</p>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav style="background:#333; text-align:center; padding:15px;">
+    <a href="#" style="color:white; margin:0 20px; text-decoration:none; font-weight:bold;">Profil</a>
+    <a href="#" style="color:white; margin:0 20px; text-decoration:none; font-weight:bold;">Beranda</a>
+    <a href="#" style="color:white; margin:0 20px; text-decoration:none; font-weight:bold;">Dosen</a>
+    <a href="#" style="color:white; margin:0 20px; text-decoration:none; font-weight:bold;">Galeri</a>
+    <a href="#" style="color:white; margin:0 20px; text-decoration:none; font-weight:bold;">Kontak</a>
+  </nav>
+
+  <!-- CONTENT -->
+  <main style="max-width:1200px; margin:30px auto; padding:20px;">
+
+    <section style="background:white; margin-bottom:20px; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+      <h2 style="color:#04aa6d; margin-bottom:20px;">Informasi Kampus</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus quos tempora,
+        exercitationem illum praesentium distinctio nemo ut,
+        provident, neque est iste enim perspiciatis assumenda asperiores.
+      </p>
+    </section>
+
+    <section style="background:white; margin-bottom:20px; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+      <h2 style="color:#04aa6d; margin-bottom:20px;">Daftar Dosen</h2>
+
+      <div style="display:flex; flex-wrap:wrap; gap:20px;">
+        
+        <div style="flex:1; min-width:250px; background:#f8f9fa; padding:20px; border-radius:10px; border-left:5px solid #04aa6d;">
+          <h3>Pak Budi Santoso</h3>
+          <p><b>Matku:</b> Matematika</p>
+        </div>
+
+        <div style="flex:1; min-width:250px; background:#f8f9fa; padding:20px; border-radius:10px; border-left:5px solid #04aa6d;">
+          <h3>Bu Siti Aminah</h3>
+          <p><b>Matku:</b> Bahasa Indonesia</p>
+        </div>
+
+        <div style="flex:1; min-width:250px; background:#f8f9fa; padding:20px; border-radius:10px; border-left:5px solid #04aa6d;">
+          <h3>Pak Andi Wijaya</h3>
+          <p><b>Matku:</b> Fisika</p>
+        </div>
+
+        <div style="flex:1; min-width:250px; background:#f8f9fa; padding:20px; border-radius:10px; border-left:5px solid #04aa6d;">
+          <h3>Bu Rina Kartika</h3>
+          <p><b>Matku:</b> Bahasa Inggris</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section style="background:white; margin-bottom:20px; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+      <h2 style="color:#04aa6d; margin-bottom:20px;">Galeri</h2>
+      <img src="https://uinsatu.ac.id/wp-content/uploads/2021/05/IAIN_Tulungagung_Berubah_Bentuk_Menjadi_UIN_Sayyid_Ali_Rahmatullah_Tulungagung_1.jpg"
+           alt="UIN SATU"
+           style="width:100%; height:300px; object-fit:cover; border-radius:10px;">
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="background:#333; color:white; text-align:center; padding:20px; margin-top:30px;">
+    <p>&copy; 2026 UIN SATU</p>
+    <p>Jl. Raya No. 999</p>
+  </footer>
+
+</body>
+</html>`;
+
+      function highlightHTML(text) {
+        // Comments
+        text = text.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="comment">$1</span>');
+
+        // Tags and attributes
+        text = text.replace(/(&lt;\/?[a-z0-9]+)(.*?)(&gt;)/gi, function (_, start, middle, end) {
+          let attrs = middle.replace(/([a-z-]+)=(".*?")/gi, '<span class="attr">$1</span>=<span class="value">$2</span>');
+          return `<span class="tag">${start}</span>${attrs}<span class="tag">${end}</span>`;
+        });
+
+        // Text content
+        text = text.replace(/(&gt;)([^<]+)(&lt;)/g, (_, o, c, cl) => `${o}<span class="text">${c}</span>${cl}`);
+
+        return text;
+      }
+
+      function syncScroll() {
+        highlight.scrollTop = code.scrollTop;
+        highlight.scrollLeft = code.scrollLeft;
+      }
+
+      function updatePreview() {
+        preview.srcdoc = code.value;
+        const escaped = code.value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        highlight.innerHTML = highlightHTML(escaped);
+        syncScroll();
+
+        // Update cursor position setelah render
+        setTimeout(() => {
+          code.setSelectionRange(currentCursorPos, currentCursorPos);
+        }, 0);
+      }
+
+      // Update cursor position secara real-time
+      code.addEventListener("input", () => {
+        currentCursorPos = code.selectionStart;
+      });
+      code.addEventListener("click", () => {
+        currentCursorPos = code.selectionStart;
+      });
+      code.addEventListener("keyup", () => {
+        currentCursorPos = code.selectionStart;
+      });
+
+      // Event listeners untuk sync scroll
+      code.addEventListener("scroll", syncScroll);
+      code.addEventListener("input", updatePreview);
+
+      function insertTag(tag) {
+        const start = code.selectionStart;
+        const end = code.selectionEnd;
+        code.value = code.value.substring(0, start) + tag + code.value.substring(end);
+
+        // Set cursor position setelah tag ditambahkan
+        const newPos = start + tag.length;
+        code.focus();
+        code.setSelectionRange(newPos, newPos);
+        currentCursorPos = newPos;
+
+        updatePreview();
+      }
+
+      function insertListItem() {
+        const pos = code.selectionStart;
+        const text = code.value;
+        const start = text.lastIndexOf("<li", pos);
+        const end = text.indexOf("</li>", start);
+
+        if (start !== -1 && end !== -1) {
+          const newItem = "\n  <li>Item baru</li>";
+          code.value = text.substring(0, end) + newItem + text.substring(end);
+          currentCursorPos = end + newItem.length;
+        }
+        updatePreview();
+        hidePopup();
+      }
+
+      function resetCode() {
+        code.value = DEFAULT_CODE;
+        updatePreview();
+        code.focus();
+      }
+
+      function applyStyle(style) {
+        const pos = code.selectionStart;
+        const text = code.value;
+        const start = text.lastIndexOf("<", pos);
+        const end = text.indexOf(">", pos);
+
+        if (start === -1 || end === -1) {
+          hidePopup();
+          return;
+        }
+
+        let tag = text.substring(start, end + 1);
+
+        if (tag.includes('style="')) {
+          tag = tag.replace(/style="(.*?)"/, (_, s) => `style="${s.trim()} ${style}"`);
+        } else {
+          tag = tag.slice(0, -1) + ` style="${style}">`;
+        }
+
+        code.value = text.substring(0, start) + tag + text.substring(end + 1);
+        currentCursorPos = pos; // Kembalikan ke posisi semula
+        updatePreview();
+        hidePopup();
+      }
+
+      function getTag() {
+        const pos = code.selectionStart;
+        const text = code.value;
+        const start = text.lastIndexOf("<", pos);
+        const end = text.indexOf(">", pos);
+
+        if (start === -1 || end === -1) return null;
+
+        const tagContent = text
+          .substring(start + 1, end)
+          .split(" ")[0]
+          .toLowerCase();
+        return tagContent;
+      }
+
+      function showPopup(e) {
+        e.stopPropagation();
+        currentCursorPos = code.selectionStart; // Simpan posisi cursor
+        const tag = getTag();
+
+        if (!tag) {
+          hidePopup();
+          return;
+        }
+
+        // Hide all menus
+        [textMenu, divMenu, imgMenu, formMenu, listMenu].forEach((menu) => {
+          menu.style.display = "none";
+        });
+
+        // Show appropriate menu
+        if (/^h[1-6]$/.test(tag) || tag === "p" || tag === "span" || tag === "a") {
+          textMenu.style.display = "block";
+        } else if (tag === "div") {
+          divMenu.style.display = "block";
+        } else if (tag === "img") {
+          imgMenu.style.display = "block";
+        } else if (tag === "form" || tag === "input" || tag === "textarea" || tag === "button" || tag === "select") {
+          formMenu.style.display = "block";
+        } else if (tag === "ul" || tag === "ol" || tag === "li") {
+          listMenu.style.display = "block";
+        } else {
+          hidePopup();
+          return;
+        }
+
+        popup.style.display = "block";
+        popup.style.top = e.clientY + 10 + "px";
+        popup.style.left = e.clientX + 10 + "px";
+
+        // Hide submenus
+        document.querySelectorAll(".submenu").forEach((m) => (m.style.display = "none"));
+      }
+
+      function showSub(id) {
+        document.querySelectorAll(".submenu").forEach((m) => (m.style.display = "none"));
+        const submenu = document.getElementById(id);
+        if (submenu) {
+          submenu.style.display = "block";
+        }
+      }
+
+      function hidePopup() {
+        popup.style.display = "none";
+        document.querySelectorAll(".submenu").forEach((m) => (m.style.display = "none"));
+      }
+
+      // Event listeners
+      code.addEventListener("click", showPopup);
+
+      let keyupTimeout;
+      code.addEventListener("keyup", (e) => {
+        clearTimeout(keyupTimeout);
+        keyupTimeout = setTimeout(() => showPopup(e), 100);
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!popup.contains(e.target) && !code.contains(e.target)) {
+          hidePopup();
+        }
+      });
+
+      // Load default code saat halaman dimuat
+      code.value = DEFAULT_CODE;
+      updatePreview();
+    </script>
+  </body>
+</html>
